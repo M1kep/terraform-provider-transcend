@@ -7,20 +7,11 @@ import (
 )
 
 type backendTransport struct {
-	apiToken string
-}
-
-func (t *backendTransport) RoundTrip(req *http.Request) (*http.Response, error) {
-	req.Header.Add("Authorization", "Bearer "+t.apiToken)
-	return http.DefaultTransport.RoundTrip(req)
-}
-
-type sombraTransport struct {
 	apiToken    string
 	internalKey string
 }
 
-func (t *sombraTransport) RoundTrip(req *http.Request) (*http.Response, error) {
+func (t *backendTransport) RoundTrip(req *http.Request) (*http.Response, error) {
 	req.Header.Add("Authorization", "Bearer "+t.apiToken)
 	if t.internalKey != "" {
 		req.Header.Add("x-sombra-authorization", "Bearer "+t.internalKey)
@@ -35,12 +26,11 @@ type Client struct {
 }
 
 func NewClient(url, apiToken string, internalKey string) *Client {
-	backendClient := &http.Client{Transport: &backendTransport{apiToken: apiToken}}
-	sombraClient := &http.Client{Transport: &sombraTransport{apiToken: apiToken, internalKey: internalKey}}
+	client := &http.Client{Transport: &backendTransport{apiToken: apiToken, internalKey: internalKey}}
 
 	return &Client{
-		graphql:      graphql.NewClient(url, backendClient),
-		sombraClient: sombraClient,
+		graphql:      graphql.NewClient(url, client),
+		sombraClient: client,
 		url:          url,
 	}
 }

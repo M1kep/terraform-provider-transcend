@@ -49,13 +49,23 @@ func resourceDataSiloDiscoveryPlugin() *schema.Resource {
 			},
 		},
 		Importer: &schema.ResourceImporter{
-			StateContext: schema.ImportStatePassthroughContext,
+			StateContext: resourceDataSiloDiscoveryPluginImport,
 		},
 	}
 }
 
 func resourceDataSiloDiscoveryPluginCreate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	return resourceDataSiloDiscoveryPluginUpdate(ctx, d, m)
+}
+
+func resourceDataSiloDiscoveryPluginImport(ctx context.Context, d *schema.ResourceData, m interface{}) ([]*schema.ResourceData, error) {
+	dataSiloId := d.Id()
+
+	d.Set("data_silo_id", dataSiloId)
+
+	resourceDataSiloDiscoveryPluginRead(ctx, d, m)
+
+	return []*schema.ResourceData{d}, nil
 }
 
 func resourceDataSiloDiscoveryPluginRead(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {

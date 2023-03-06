@@ -50,13 +50,23 @@ func resourceContentClassificationPlugin() *schema.Resource {
 			},
 		},
 		Importer: &schema.ResourceImporter{
-			StateContext: schema.ImportStatePassthroughContext,
+			StateContext: resourceContentClassificationPluginImport,
 		},
 	}
 }
 
 func resourceContentClassificationPluginCreate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	return resourceContentClassificationPluginUpdate(ctx, d, m)
+}
+
+func resourceContentClassificationPluginImport(ctx context.Context, d *schema.ResourceData, m interface{}) ([]*schema.ResourceData, error) {
+	dataSiloId := d.Id()
+
+	d.Set("data_silo_id", dataSiloId)
+
+	resourceContentClassificationPluginRead(ctx, d, m)
+
+	return []*schema.ResourceData{d}, nil
 }
 
 func resourceContentClassificationPluginRead(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
